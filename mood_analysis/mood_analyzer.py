@@ -6,7 +6,7 @@ from textblob import TextBlob
 import re
 import logging
 import os
-from typing import List, Dict, Tuple, Optional, Set
+from typing import List, Dict, Tuple, Optional
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 import statistics
@@ -187,7 +187,7 @@ class BookMoodAnalyzer:
             # Get stopwords
             try:
                 stop_words = set(stopwords.words('english'))
-            except:
+            except LookupError:
                 stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'])
             
             # Tokenize and clean
@@ -357,7 +357,8 @@ class BookMoodAnalyzer:
             
             # Generate mood description and vibe
             mood_description = self._generate_mood_description(overall_sentiment, dynamic_moods)
-            bibliodrift_vibe = self._generate_bibliodrift_vibe(overall_sentiment, dynamic_moods)
+            bibliodrift_vibe = self._generate_bibliodrift_vibe(overall_sentiment['compound_score'], 
+                                                             [(mood, conf) for mood, conf in dynamic_moods.items()])
             
             # Calculate analysis confidence
             analysis_confidence = self._calculate_analysis_confidence(sentiment_scores, dynamic_moods)
@@ -481,7 +482,7 @@ class BookMoodAnalyzer:
         else:
             return f"This book has a {sentiment_desc} reception."
     
-    def _generate_bibliodrift_vibe(self, compound_score: float, top_moods: List[Tuple], textblob_polarity: float) -> str:
+    def _generate_bibliodrift_vibe(self, compound_score: float, top_moods: List[Tuple]) -> str:
         """Generate a BiblioDrift-style vibe description."""
         
         vibes = []

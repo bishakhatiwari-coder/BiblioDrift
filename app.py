@@ -20,17 +20,6 @@ CORS(app)
 if MOOD_ANALYSIS_AVAILABLE:
     ai_service = AIBookService()
 
-@app.route('/api/v1/generate-note', methods=['POST'])
-def handle_generate_note():
-    """Generate AI-powered book note with optional mood analysis."""
-    data = request.json
-    description = data.get('description', '')
-    title = data.get('title', '')
-    author = data.get('author', '')
-    
-    vibe = generate_book_note(description, title, author)
-    return jsonify({"vibe": vibe})
-
 @app.route('/api/v1/analyze-mood', methods=['POST'])
 def handle_analyze_mood():
     """Analyze book mood using GoodReads reviews."""
@@ -40,14 +29,17 @@ def handle_analyze_mood():
             "error": "Mood analysis not available - missing dependencies"
         }), 503
     
-    data = request.json
-    title = data.get('title', '')
-    author = data.get('author', '')
-    
-    if not title:
-        return jsonify({"error": "Title is required"}), 400
-    
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+            
+        title = data.get('title', '')
+        author = data.get('author', '')
+        
+        if not title:
+            return jsonify({"error": "Title is required"}), 400
+        
         mood_analysis = ai_service.analyze_book_mood(title, author)
         
         if mood_analysis:
@@ -70,14 +62,17 @@ def handle_analyze_mood():
 @app.route('/api/v1/mood-tags', methods=['POST'])
 def handle_mood_tags():
     """Get mood tags for a book."""
-    data = request.json
-    title = data.get('title', '')
-    author = data.get('author', '')
-    
-    if not title:
-        return jsonify({"error": "Title is required"}), 400
-    
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+            
+        title = data.get('title', '')
+        author = data.get('author', '')
+        
+        if not title:
+            return jsonify({"error": "Title is required"}), 400
+        
         mood_tags = get_book_mood_tags_safe(title, author)
         return jsonify({
             "success": True,
@@ -93,19 +88,43 @@ def handle_mood_tags():
 @app.route('/api/v1/mood-search', methods=['POST'])
 def handle_mood_search():
     """Search for books based on mood/vibe."""
-    data = request.json
-    mood_query = data.get('query', '')
-    
-    if not mood_query:
-        return jsonify({"error": "Query is required"}), 400
-    
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+            
+        mood_query = data.get('query', '')
+        
+        if not mood_query:
+            return jsonify({"error": "Query is required"}), 400
+        
         recommendations = get_ai_recommendations(mood_query)
         return jsonify({
             "success": True,
             "recommendations": recommendations,
             "query": mood_query
         })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@app.route('/api/v1/generate-note', methods=['POST'])
+def handle_generate_note():
+    """Generate AI-powered book note with optional mood analysis."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+            
+        description = data.get('description', '')
+        title = data.get('title', '')
+        author = data.get('author', '')
+        
+        vibe = generate_book_note(description, title, author)
+        return jsonify({"vibe": vibe})
         
     except Exception as e:
         return jsonify({

@@ -2,11 +2,10 @@
 # Implements 'generate_book_note' and 'get_ai_recommendations'. All recommendations MUST be AI-based.
 
 try:
-    from mood_analysis.ai_service_enhanced import AIBookService, get_book_mood_tags, generate_enhanced_book_note
+    from mood_analysis.ai_service_enhanced import get_book_mood_tags, generate_enhanced_book_note
     MOOD_ANALYSIS_AVAILABLE = True
 except ImportError:
     MOOD_ANALYSIS_AVAILABLE = False
-    print("Mood analysis not available - using fallback AI service")
 
 def generate_book_note(description, title="", author=""):
     """

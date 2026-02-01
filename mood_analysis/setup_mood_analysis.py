@@ -8,11 +8,11 @@ import subprocess
 import sys
 import os
 
-def run_command(command, description):
+def run_command(command_list, description):
     """Run a command and handle errors."""
     print(f"\n{description}...")
     try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        result = subprocess.run(command_list, check=True, capture_output=True, text=True)
         print(f"✓ {description} completed successfully")
         return True
     except subprocess.CalledProcessError as e:
@@ -45,7 +45,8 @@ def install_dependencies():
     print("\nInstalling Python dependencies...")
     
     for dep in dependencies:
-        if not run_command(f"pip install {dep}", f"Installing {dep.split('==')[0]}"):
+        package_name = dep.split('==')[0]
+        if not run_command(['pip', 'install', dep], f"Installing {package_name}"):
             return False
     
     return True

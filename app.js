@@ -123,43 +123,112 @@ class BookRenderer {
     displayMoodModal(title, moodAnalysis) {
         const modal = document.createElement('div');
         modal.className = 'mood-modal';
-        modal.innerHTML = `
-            <div class="mood-modal-content">
-                <div class="mood-modal-header">
-                    <h3>Mood Analysis: ${title}</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="mood-modal-body">
-                    <div class="mood-section">
-                        <h4>Overall Sentiment</h4>
-                        <div class="sentiment-bar">
-                            <div class="sentiment-fill" style="width: ${(moodAnalysis.overall_sentiment.compound_score + 1) * 50}%"></div>
-                        </div>
-                        <p>${moodAnalysis.mood_description}</p>
-                    </div>
-                    <div class="mood-section">
-                        <h4>Primary Moods</h4>
-                        <div class="mood-tags-large">
-                            ${moodAnalysis.primary_moods.map(mood => 
-                                `<span class="mood-tag-large mood-${mood.mood}">${mood.mood} (${mood.frequency})</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                    <div class="mood-section">
-                        <h4>BiblioDrift Vibe</h4>
-                        <div class="vibe-quote">"${moodAnalysis.bibliodrift_vibe}"</div>
-                    </div>
-                    <div class="mood-section">
-                        <small>Based on ${moodAnalysis.total_reviews_analyzed} GoodReads reviews</small>
-                    </div>
-                </div>
-            </div>
-        `;
+        
+        // Create modal content safely using DOM methods
+        const content = document.createElement('div');
+        content.className = 'mood-modal-content';
+        
+        // Header
+        const header = document.createElement('div');
+        header.className = 'mood-modal-header';
+        
+        const headerTitle = document.createElement('h3');
+        headerTitle.textContent = `Mood Analysis: ${title}`;
+        
+        const closeButton = document.createElement('button');
+        closeButton.className = 'close-modal';
+        closeButton.textContent = '×';
+        
+        header.appendChild(headerTitle);
+        header.appendChild(closeButton);
+        
+        // Body
+        const body = document.createElement('div');
+        body.className = 'mood-modal-body';
+        
+        // Overall Sentiment section
+        const overallSection = document.createElement('div');
+        overallSection.className = 'mood-section';
+        
+        const overallHeading = document.createElement('h4');
+        overallHeading.textContent = 'Overall Sentiment';
+        
+        const sentimentBar = document.createElement('div');
+        sentimentBar.className = 'sentiment-bar';
+        
+        const sentimentFill = document.createElement('div');
+        sentimentFill.className = 'sentiment-fill';
+        const compoundScore = moodAnalysis.overall_sentiment?.compound_score || 0;
+        sentimentFill.style.width = `${(compoundScore + 1) * 50}%`;
+        
+        sentimentBar.appendChild(sentimentFill);
+        
+        const moodDescription = document.createElement('p');
+        moodDescription.textContent = moodAnalysis.mood_description || '';
+        
+        overallSection.appendChild(overallHeading);
+        overallSection.appendChild(sentimentBar);
+        overallSection.appendChild(moodDescription);
+        
+        // Primary Moods section
+        const primarySection = document.createElement('div');
+        primarySection.className = 'mood-section';
+        
+        const primaryHeading = document.createElement('h4');
+        primaryHeading.textContent = 'Primary Moods';
+        
+        const moodTagsContainer = document.createElement('div');
+        moodTagsContainer.className = 'mood-tags-large';
+        
+        const primaryMoods = Array.isArray(moodAnalysis.primary_moods) ? moodAnalysis.primary_moods : [];
+        primaryMoods.forEach(mood => {
+            const span = document.createElement('span');
+            const moodName = String(mood.mood || '');
+            span.className = `mood-tag-large mood-${moodName}`;
+            span.textContent = `${moodName} (${mood.confidence || mood.frequency || 0})`;
+            moodTagsContainer.appendChild(span);
+        });
+        
+        primarySection.appendChild(primaryHeading);
+        primarySection.appendChild(moodTagsContainer);
+        
+        // BiblioDrift Vibe section
+        const vibeSection = document.createElement('div');
+        vibeSection.className = 'mood-section';
+        
+        const vibeHeading = document.createElement('h4');
+        vibeHeading.textContent = 'BiblioDrift Vibe';
+        
+        const vibeQuote = document.createElement('div');
+        vibeQuote.className = 'vibe-quote';
+        vibeQuote.textContent = `"${moodAnalysis.bibliodrift_vibe || ''}"`;
+        
+        vibeSection.appendChild(vibeHeading);
+        vibeSection.appendChild(vibeQuote);
+        
+        // Reviews analyzed section
+        const reviewsSection = document.createElement('div');
+        reviewsSection.className = 'mood-section';
+        
+        const reviewsInfo = document.createElement('small');
+        reviewsInfo.textContent = `Based on ${moodAnalysis.total_reviews_analyzed || 0} GoodReads reviews`;
+        
+        reviewsSection.appendChild(reviewsInfo);
+        
+        // Assemble everything
+        body.appendChild(overallSection);
+        body.appendChild(primarySection);
+        body.appendChild(vibeSection);
+        body.appendChild(reviewsSection);
+        
+        content.appendChild(header);
+        content.appendChild(body);
+        modal.appendChild(content);
 
         document.body.appendChild(modal);
 
         // Close modal functionality
-        modal.querySelector('.close-modal').addEventListener('click', () => {
+        closeButton.addEventListener('click', () => {
             document.body.removeChild(modal);
         });
 
