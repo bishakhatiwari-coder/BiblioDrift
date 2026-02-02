@@ -86,7 +86,7 @@ Style: Personal, insightful, like talking to a trusted book friend.""")
 
 class LLMService:
     """
-    Production-grade LLM service supporting OpenAI and Google Gemini.
+    Production-grade LLM service supporting OpenAI, Groq, and Google Gemini.
     All configuration via environment variables.
     """
     
@@ -124,7 +124,7 @@ class LLMService:
             try:
                 # Test if we can create a client
                 from openai import OpenAI
-                client = OpenAI(api_key=api_key)
+                OpenAI(api_key=api_key)  # Test client creation
                 self.openai_client = True  # Just mark as available
                 logger.info(f"OpenAI client initialized with model: {self.config['openai_model']}")
             except Exception as e:
@@ -375,7 +375,6 @@ def get_book_mood_tags_safe(title: str, author: str = "") -> list:
         try:
             return get_book_mood_tags(title, author)
         except Exception as e:
-            logger = logging.getLogger(__name__)
             logger.error(f"Error getting mood tags: {e}")
     
     return []
