@@ -445,6 +445,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderer = new BookRenderer();
     const libManager = new LibraryManager();
     const themeManager = new ThemeManager();
+    const exportBtn = document.getElementById("export-library");
+
+if (exportBtn) {
+    const isLibraryPage = document.getElementById("shelf-want");
+    exportBtn.style.display = isLibraryPage ? "inline-flex" : "none";
+}
+
+
 
     // Search Handler
     const searchInput = document.getElementById('searchInput');
@@ -513,24 +521,56 @@ if (backToTopBtn) {
 }
 });
 
-// Export Library as JSON
-document.getElementById("export-library").addEventListener("click", () => {
-    const library = localStorage.getItem("bibliodrift_library"); // replace with your actual localStorage key
-    if (!library) {
-        alert("Your library is empty!");
-        return;
+document.addEventListener('DOMContentLoaded', () => {
+    const exportBtn = document.getElementById("export-library");
+    if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+            const library = localStorage.getItem("bibliodrift_library");
+            if (!library) {
+                alert("Your library is empty!");
+                return;
+            }
+
+            const blob = new Blob([library], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `bibliodrift_library_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            URL.revokeObjectURL(url);
+            alert("Library exported successfully!");
+        });
     }
-
-    const blob = new Blob([library], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bibliodrift_library_${new Date().toISOString().slice(0,10)}.json`; // optional timestamp
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-    alert("Library exported successfully!");
 });
+
+// Export Library as JSON
+// Export Library as JSON
+const exportBtn = document.getElementById("export-library");
+
+if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+        const library = localStorage.getItem("bibliodrift_library");
+        if (!library) {
+            alert("Your library is empty!");
+            return;
+        }
+
+        const blob = new Blob([library], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `bibliodrift_library_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+        alert("Library exported successfully!");
+    });
+}
+

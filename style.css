@@ -786,16 +786,18 @@ main {
     display: flex; /* make sure it shows */
     align-items: center;
     gap: 0.3rem;
-    background-color: #6c5ce7;
-    color: white;
-    border: none;
+    background-color: #F5F5DC;
+    color: #674736;
+    border: 2px solid #674736;
     border-radius: 5px;
     padding: 0.4rem 0.6rem;
     cursor: pointer;
     font-size: 0.85rem;
     transition: background 0.2s;
+    
 }
 
 #export-library:hover {
-    background-color: #a29bfe;
+    background-color: #674736;
+    color: #F5F5DC;
 }
